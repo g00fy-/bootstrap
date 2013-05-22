@@ -27,7 +27,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle',
         if (!parent) {
           parent = element.parent();
           parent.bind('click', function (e) {
-            closeMenu(e)
+            closeMenu(e);
           });
         }
         event.preventDefault();
