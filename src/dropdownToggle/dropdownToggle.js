@@ -13,22 +13,31 @@
  */
 
 angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle',
-  ['$document', '$location', '$window', function ($document, $location, $window) {
+  ['$document', '$location', function ($document, $location) {
   var openElement = null,
-      closeMenu   = angular.noop;
+      closeMenu = angular.noop;
   return {
     restrict: 'CA',
-    link: function(scope, element, attrs) {
-      scope.$watch('$location.path', function() { closeMenu(); });
-      element.parent().bind('click', function() { closeMenu(); });
-      element.bind('click', function(event) {
+    link: function (scope, element) {
+      scope.$watch('$location.path', function () {
+        closeMenu();
+      });
+      var parent;
+      element.bind('click', function (event) {
+        if (!parent) {
+          parent = element.parent();
+          parent.bind('click', function (e) {
+            closeMenu(e)
+          });
+        }
         event.preventDefault();
         event.stopPropagation();
         var elementWasOpen = (element === openElement);
         if (!!openElement) {
-          closeMenu(); }
-        if (!elementWasOpen){
-          element.parent().addClass('open');
+          closeMenu();
+        }
+        if (!elementWasOpen) {
+          parent.addClass('open');
           openElement = element;
           closeMenu = function (event) {
             if (event) {
@@ -36,8 +45,8 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle',
               event.stopPropagation();
             }
             $document.unbind('click', closeMenu);
-            element.parent().removeClass('open');
-            closeMenu   = angular.noop;
+            parent.removeClass('open');
+            closeMenu = angular.noop;
             openElement = null;
           };
           $document.bind('click', closeMenu);
